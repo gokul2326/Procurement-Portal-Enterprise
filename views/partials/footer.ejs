@@ -1,0 +1,56 @@
+  </main>
+
+  <footer class="bg-slate-950 border-t border-slate-800 text-slate-400 py-8 text-sm mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">GP</div>
+        <div>
+          <p class="text-white font-semibold">GovProcure Enterprise Platform</p>
+          <p class="text-xs text-slate-500">Government Electronic Public Procurement Portal &copy; 2026</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-6 text-xs text-slate-400">
+        <a href="/manual" class="hover:text-amber-400 transition">Operating Manual</a>
+        <a href="/" class="hover:text-amber-400 transition">Tender Transparency Explorer</a>
+        <a href="/login" class="hover:text-amber-400 transition">Government Console</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/i18n.js"></script>
+  <!-- Service Worker Registration for PWA / Downloadable App -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+          console.log('Enterprise PWA Service Worker Registered', reg);
+        }).catch(err => {
+          console.warn('Service Worker Registration Failed', err);
+        });
+      });
+    }
+
+    // PWA Install prompt handling
+    let deferredPrompt;
+    const installBtn = document.getElementById('pwaInstallBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (installBtn) {
+        installBtn.classList.remove('hidden');
+        installBtn.classList.add('flex');
+        installBtn.addEventListener('click', () => {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              installBtn.classList.add('hidden');
+            }
+            deferredPrompt = null;
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>
