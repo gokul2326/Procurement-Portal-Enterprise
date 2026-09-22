@@ -1,0 +1,230 @@
+<%- include('partials/header') %>
+<div class="space-y-8">
+  <div class="border-b border-slate-800 pb-5">
+    <div class="flex items-center gap-3">
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">Government Official Operations Console</h1>
+      <span class="text-xs bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-2.5 py-0.5 rounded font-mono font-bold">SUPERVISOR ACCESS</span>
+    </div>
+    <p class="text-slate-400 text-sm mt-1">Lifecycle monitoring of public works tenders, contractor awards, and statutory credential vetting.</p>
+  </div>
+
+  <!-- Operational Statistics Overview -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+    <a href="/govt/dashboard?status=all" class="bg-slate-950 border <%= currentFilter === 'all' ? 'border-amber-400' : 'border-slate-800' %> p-4 rounded-2xl hover:border-slate-700 transition">
+      <p class="text-[10px] uppercase font-bold text-slate-400">Total Tenders</p>
+      <p class="text-xl font-bold text-white mt-1"><%= stats.totalTenders %></p>
+    </a>
+    <a href="/govt/dashboard?status=new" class="bg-slate-950 border <%= currentFilter === 'new' ? 'border-amber-400' : 'border-slate-800' %> p-4 rounded-2xl hover:border-slate-700 transition">
+      <p class="text-[10px] uppercase font-bold text-sky-400">New / Published</p>
+      <p class="text-xl font-bold text-sky-400 mt-1"><%= stats.newTenders %></p>
+    </a>
+    <a href="/govt/dashboard?status=assigned" class="bg-slate-950 border <%= currentFilter === 'assigned' ? 'border-amber-400' : 'border-slate-800' %> p-4 rounded-2xl hover:border-slate-700 transition">
+      <p class="text-[10px] uppercase font-bold text-amber-400">Assigned / Awarded</p>
+      <p class="text-xl font-bold text-amber-400 mt-1"><%= stats.assignedTenders %></p>
+    </a>
+    <a href="/govt/dashboard?status=in-progress" class="bg-slate-950 border <%= currentFilter === 'in-progress' ? 'border-amber-400' : 'border-slate-800' %> p-4 rounded-2xl hover:border-slate-700 transition">
+      <p class="text-[10px] uppercase font-bold text-indigo-400">In-Progress</p>
+      <p class="text-xl font-bold text-indigo-400 mt-1"><%= stats.inProgressTenders %></p>
+    </a>
+    <a href="/govt/dashboard?status=completed" class="bg-slate-950 border <%= currentFilter === 'completed' ? 'border-amber-400' : 'border-slate-800' %> p-4 rounded-2xl hover:border-slate-700 transition">
+      <p class="text-[10px] uppercase font-bold text-emerald-400">Completed Works</p>
+      <p class="text-xl font-bold text-emerald-400 mt-1"><%= stats.completedTenders %></p>
+    </a>
+    <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl">
+      <p class="text-[10px] uppercase font-bold text-rose-400">Pending Vetting</p>
+      <p class="text-xl font-bold text-rose-400 mt-1"><%= stats.pendingApprovals %></p>
+    </div>
+  </div>
+
+  <!-- User Account Authorizations Section -->
+  <div class="bg-slate-950 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+    <h2 class="text-lg font-bold text-white mb-4 flex items-center">
+      <i class="fa-solid fa-user-clock text-amber-400 mr-2.5"></i> Pending Registrations Requiring Authorization (<%= pendingUsers.length %>)
+    </h2>
+
+    <% if (pendingUsers.length === 0) { %>
+      <p class="text-xs text-slate-500">No applicant accounts currently waiting for statutory approval.</p>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-900 border-b border-slate-800 text-slate-400 uppercase tracking-wider">
+              <th class="p-3.5">Name</th>
+              <th class="p-3.5">Email</th>
+              <th class="p-3.5">Role</th>
+              <th class="p-3.5">Company & GST / Registration</th>
+              <th class="p-3.5 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60">
+            <% pendingUsers.forEach(u => { %>
+              <tr class="hover:bg-slate-900/60 transition">
+                <td class="p-3.5 font-bold text-white"><%= u.name %></td>
+                <td class="p-3.5 text-slate-300"><%= u.email %></td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase <%= u.role === 'official' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-amber-500/20 text-amber-300' %>"><%= u.role %></span></td>
+                <td class="p-3.5 text-slate-300">
+                  <%= u.companyDetails.companyName || 'N/A' %>
+                  <span class="block text-[11px] font-mono text-slate-500"><%= u.companyDetails.registrationNumber %></span>
+                </td>
+                <td class="p-3.5 text-right space-x-2">
+                  <form action="/govt/approve-user/<%= u._id %>" method="POST" class="inline">
+                    <button type="submit" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold">
+                      Approve
+                    </button>
+                  </form>
+                  <form action="/govt/reject-user/<%= u._id %>" method="POST" class="inline">
+                    <button type="submit" class="px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold">
+                      Reject
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Publish New Tender Form -->
+  <div class="bg-slate-950 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+    <h2 class="text-lg font-bold text-white mb-4 flex items-center">
+      <i class="fa-solid fa-plus-circle text-indigo-400 mr-2.5"></i> Publish New Tender Notice
+    </h2>
+    <form action="/govt/tenders/add" method="POST" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Tender Title</label>
+          <input type="text" name="title" required placeholder="Construction of Rural Bridge" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Category</label>
+          <input type="text" name="category" required placeholder="Highways / Water / IT" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Tender Type</label>
+          <select name="type" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs">
+            <option value="Open Tender">Open Tender</option>
+            <option value="Limited Tender">Limited Tender</option>
+            <option value="Global Tender">Global Tender</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Budget (INR)</label>
+          <input type="number" name="budget" required placeholder="7500000" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">State</label>
+          <input type="text" name="state" required placeholder="Karnataka" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">District</label>
+          <input type="text" name="district" required placeholder="Bengaluru" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Taluk</label>
+          <input type="text" name="taluk" required placeholder="Yelahanka" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Village / Ward</label>
+          <input type="text" name="village" placeholder="Singanayakanahalli" class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Specifications & Scope of Work</label>
+        <textarea name="description" rows="2" required placeholder="Detail the technical specifications, delivery milestones, and quality thresholds..." class="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs"></textarea>
+      </div>
+
+      <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl transition">
+        Publish Tender
+      </button>
+    </form>
+  </div>
+
+  <!-- Manage Tenders, Update Work Status & Award Contracts -->
+  <div class="bg-slate-950 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-lg font-bold text-white">
+        Tender Management Matrix (Showing: <%= currentFilter.toUpperCase() %>)
+      </h2>
+      <span class="text-xs text-slate-400">Total Count: <%= tenders.length %></span>
+    </div>
+
+    <div class="space-y-4">
+      <% tenders.forEach(tender => { %>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-3">
+            <div>
+              <span class="font-mono text-xs font-bold text-indigo-400"><%= tender.tenderId %></span>
+              <h3 class="text-base font-bold text-white inline ml-2"><%= tender.title %></h3>
+            </div>
+
+            <!-- Status Transition & Actions -->
+            <div class="flex items-center gap-2">
+              <form action="/govt/tenders/<%= tender._id %>/status" method="POST" class="inline flex items-center gap-1.5">
+                <select name="status" onchange="this.form.submit()" class="bg-slate-950 border border-slate-700 text-xs text-white rounded-lg px-2.5 py-1">
+                  <option value="new" <%= tender.status === 'new' ? 'selected' : '' %>>New</option>
+                  <option value="assigned" <%= tender.status === 'assigned' ? 'selected' : '' %>>Assigned</option>
+                  <option value="in-progress" <%= tender.status === 'in-progress' ? 'selected' : '' %>>In-Progress</option>
+                  <option value="completed" <%= tender.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                  <option value="cancelled" <%= tender.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                </select>
+              </form>
+
+              <form action="/govt/tenders/<%= tender._id %>/delete" method="POST" class="inline">
+                <button type="submit" class="px-2.5 py-1 bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 rounded-lg text-xs">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 mb-2"><%= tender.description %></p>
+          <div class="text-xs text-slate-500 flex flex-wrap gap-4 mb-4">
+            <span>Location: <%= tender.location.taluk %>, <%= tender.location.district %></span>
+            <span>Budget: <strong class="text-slate-300 font-mono">INR <%= tender.budget.toLocaleString('en-IN') %></strong></span>
+            <span>Contractor: <strong class="text-amber-400"><%= tender.assignedBidder ? (tender.assignedBidder.companyDetails.companyName || tender.assignedBidder.name) : 'Unassigned' %></strong></span>
+          </div>
+
+          <!-- Bids Received Section -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+            <h4 class="text-[11px] uppercase font-bold text-slate-400 mb-2">Bids Submitted (<%= tender.bids.length %>)</h4>
+            <% if (tender.bids.length === 0) { %>
+              <p class="text-xs text-slate-600">No bids submitted yet for this tender notice.</p>
+            <% } else { %>
+              <div class="space-y-2">
+                <% tender.bids.forEach(bid => { %>
+                  <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-xs">
+                    <div>
+                      <span class="font-bold text-white"><%= bid.companyName %></span> (<%= bid.bidderName %>)
+                      <div class="text-slate-400 mt-0.5">
+                        Bid: <span class="text-emerald-400 font-mono font-bold">INR <%= bid.bidAmount.toLocaleString('en-IN') %></span> • <%= bid.proposalNote %>
+                      </div>
+                    </div>
+                    <% if (tender.status === 'new') { %>
+                      <form action="/govt/tenders/<%= tender._id %>/assign" method="POST">
+                        <input type="hidden" name="bidderId" value="<%= bid.bidderId %>">
+                        <button type="submit" class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs">
+                          Award Contract
+                        </button>
+                      </form>
+                    <% } else if (tender.assignedBidder && tender.assignedBidder._id.toString() === bid.bidderId.toString()) { %>
+                      <span class="text-emerald-400 font-bold flex items-center">
+                        <i class="fa-solid fa-circle-check mr-1.5"></i> Contract Awarded
+                      </span>
+                    <% } %>
+                  </div>
+                <% }) %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+<%- include('partials/footer') %>

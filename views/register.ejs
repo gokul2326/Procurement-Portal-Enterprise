@@ -1,0 +1,79 @@
+<%- include('partials/header') %>
+<div class="flex justify-center items-center py-6">
+  <div class="w-full max-w-xl bg-slate-950 border border-slate-800 rounded-2xl shadow-2xl p-8">
+    <div class="text-center mb-6">
+      <div class="w-12 h-12 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+        <i class="fa-solid fa-id-card-clip text-xl"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-white tracking-tight" data-i18n="nav_register">Contractor & Official Enrollment</h2>
+      <p class="text-xs text-amber-300 bg-amber-950/40 border border-amber-500/30 p-2.5 rounded-xl mt-3 text-left flex items-start">
+        <i class="fa-solid fa-shield-halved text-amber-400 mr-2 mt-0.5"></i>
+        <span><strong>Verification Protocol:</strong> Accounts require identity vetting and approval by a Government Official before access is granted.</span>
+      </p>
+    </div>
+
+    <form action="/register" method="POST" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Authorized Representative</label>
+          <input type="text" name="name" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Anand Sharma">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Email Contact</label>
+          <input type="email" name="email" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="asharma@apexinfra.com">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Password</label>
+          <input type="password" name="password" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Min. 6 alphanumeric">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Role Type</label>
+          <select name="role" id="roleSelect" onchange="toggleBidderFields(this.value)" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+            <option value="bidder">Contractor / Corporate Bidder</option>
+            <option value="official">Government Procurement Official</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="bidderFields" class="space-y-4 border-t border-slate-800 pt-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Registered Entity Name</label>
+            <input type="text" name="companyName" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Apex Infra Projects Pvt Ltd">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Registration / GST Identification</label>
+            <input type="text" name="registrationNumber" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="GST29AAACP1234F1Z5">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Specialization Category</label>
+          <input type="text" name="category" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="e.g. Highways, Bridges, Smart Utilities, Renewable Power">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Track Record of Prior Completed Works</label>
+          <textarea name="previousWorks" rows="2" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="State prior public works contracts, budgets, and project durations..."></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-amber-500/20 transition text-sm">
+        Submit Credentials for Approval
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function toggleBidderFields(role) {
+    const fields = document.getElementById('bidderFields');
+    if (role === 'official') {
+      fields.classList.add('hidden');
+    } else {
+      fields.classList.remove('hidden');
+    }
+  }
+</script>
+<%- include('partials/footer') %>
